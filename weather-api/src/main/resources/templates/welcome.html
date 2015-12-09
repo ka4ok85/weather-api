@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Weather API::Welcome::Find City</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<h1>Input Your City</h1>
+    <form action="#" th:action="@{/welcome}" th:object="${city}" method="post">
+        <p>City: <input type="text" th:field="*{city}" /></p>
+        <p th:if="${#fields.hasErrors('city')}" th:errors="*{city}">City Error</p>
+        <p><input type="submit" value="Search" /> <input type="reset" value="Reset" /></p>
+    </form>
+</body>
+</html>
