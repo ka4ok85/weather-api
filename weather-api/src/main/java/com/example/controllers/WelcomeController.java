@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -141,8 +143,8 @@ HttpStatus statusCode = responseEntity.getStatusCode();
 
  // CityAutoComplete usage
 
-      CityAutoComplete cityAutoComplete = restTemplate.getForObject(url, CityAutoComplete.class);
-      log.info(cityAutoComplete.toString());
+      //CityAutoComplete cityAutoComplete = restTemplate.getForObject(url, CityAutoComplete.class);
+      //log.info(cityAutoComplete.toString());
       
  /*
        ArrayList<CityItem> items = (ArrayList<CityItem>) cityAutoComplete.getRESULTS();
@@ -153,6 +155,26 @@ HttpStatus statusCode = responseEntity.getStatusCode();
       log.info(a.toString());
       */      
         //ResponseEntity<ArrayList<CityItem> responseEntity = restTemplate.getForEntity(url, ArrayList.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(supportedMediaTypes);
+        HttpEntity<CityItem> entity = new HttpEntity<CityItem>(headers);
+        
+        ResponseEntity<CityAutoComplete> result = restTemplate.exchange(url, HttpMethod.GET, entity, CityAutoComplete.class);
+
+        log.info(result.getBody().toString());
+
+        
+        ResponseEntity<CityAutoComplete> responseEntity = restTemplate.getForEntity(url, CityAutoComplete.class);
+        CityAutoComplete body = responseEntity.getBody();
+        System.out.println(responseEntity.getBody());
+        System.out.println(body);
+        log.info(body.toString());
+        
+        ArrayList<CityItem> q = (ArrayList<CityItem>) body.getRESULTS();
+        System.out.println(q.size());
+        
+   
+        
         model.addAttribute("city", city);
 
         return "citylist";

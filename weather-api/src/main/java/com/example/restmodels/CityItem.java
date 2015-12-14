@@ -1,19 +1,32 @@
 package com.example.restmodels;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CityItem {
 
+	@JsonProperty
 	private String name; // Name of city
+	@JsonProperty
 	private String type; // response type (city or hurricane)
+	@JsonProperty
 	private String c;    // Country
+	@JsonProperty
 	private String zmw;
+	@JsonProperty
 	private String tz;   // time zone
+	@JsonProperty
 	private String tzs;  // time zone code
+	@JsonProperty
 	private String l;    // URL path and query string for result
+	@JsonProperty
 	private String ll;   // Combined lat + lon
+	@JsonProperty
 	private String lat;
+	@JsonProperty
 	private String lon;
 
 	public String getName() {
