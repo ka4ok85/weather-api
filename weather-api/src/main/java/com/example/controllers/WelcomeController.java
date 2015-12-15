@@ -2,16 +2,11 @@ package com.example.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -25,11 +20,12 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.WeatherApiApplication;
 import com.example.mvcmodels.City;
+import com.example.mvcmodels.CityCountry;
 import com.example.restmodels.CityAutoComplete;
 import com.example.restmodels.CityItem;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.example.restmodels.Conditions;
+import com.example.service.CommandCityAutoCompleteFailure;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 public class WelcomeController {
@@ -46,11 +42,32 @@ public class WelcomeController {
     }
 
     @RequestMapping(value="/welcome", method=RequestMethod.POST)
-    public String checkPersonInfo(@Valid City city, BindingResult bindingResult, Model model) {
+    public String checkCity(@Valid City city, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "welcome";
         }    	
 
+        String url ="http://autocomplete.wunderground.com/aq?query=" + city.getCity(); 
+        log.info(url);
+
+        CityAutoComplete body = new CommandCityAutoCompleteFailure(url).execute();
+        log.info(body.toString());
+
+        ArrayList<CityItem> cityList = (ArrayList<CityItem>) body.getRESULTS();
+
+        model.addAttribute("city", city);
+        model.addAttribute("cityList", cityList);
+
+        return "citylist";
+    }
+
+    
+    @RequestMapping(value="/details", method=RequestMethod.GET)
+    public String checkPersonInfo(@Valid CityCountry cityCountry, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "welcome";
+        }
+        
         RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
         
@@ -64,120 +81,20 @@ public class WelcomeController {
                 jsonConverter.setObjectMapper(new ObjectMapper());
                 jsonConverter.setSupportedMediaTypes(
                 		supportedMediaTypes
-                		//new MediaType("application", "json", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET),
-                		//new MediaType("text", "javascript", MappingJackson2HttpMessageConverter.DEFAULT_CHARSET)
                 );
             }
         }
         
+        String url ="http://api.wunderground.com/api/" + apiKey + "/conditions/q/" + cityCountry.getCountry() + "/" + cityCountry.getCity() + ".json";
+        log.info(url);
         
-/*
-ResponseEntity<Object[]> responseEntity = restTemplate.getForEntity(urlGETList, Object[].class);
-Object[]=responseEntity.getBody();
-MediaType contentType = responseEntity.getHeaders().getContentType();
-HttpStatus statusCode = responseEntity.getStatusCode();         
- */
-        //CityAutoComplete cityResponse = restTemplate.getForObject("http://autocomplete.wunderground.com/aq?query=San%20F", CityAutoComplete.class);
-        //log.info(cityResponse.toString());
-        String url ="http://autocomplete.wunderground.com/aq?query=atlan"; 
-        //CityItem[] forNow = restTemplate.getForObject("http://autocomplete.wunderground.com/aq?query=San%20F", CityItem[].class);
-        //ResponseEntity<CityItem[]> responseEntity = restTemplate.getForEntity(url, CityItem[].class);
-        //ResponseEntity<ArrayList<CityItem>> responseEntity = restTemplate.getForEntity(url, ArrayList<CityItem>.class);
-
-    	
-        
-/*
- //Map<List> w/o parent
-        Map<String,List<CityItem>> myDomainListMap = restTemplate.getForObject(url, Map.class);
-        log.info(myDomainListMap.toString());
-        log.info(myDomainListMap.getClass().toString());
-        
-        List<CityItem> myDomainList = myDomainListMap.get("RESULTS");
-        log.info(myDomainList.toString());
-        log.info(myDomainList.getClass().toString());
-        
-        
-        //log.info((String)myDomainList.size());
-        log.info(myDomainList.get(0).toString());
-        
-        //List<CityItem> myDomainList = restTemplate.getForObject(url, List.class);
-*/
-        
-        //restTemplate.exchange(url, method, requestEntity, responseType)
-        
-
-        /*
-        ResponseEntity<CityAutoComplete> response = restTemplate.exchange(
-        		url,HttpMethod.GET, null, CityAutoComplete.class);
-        log.info(response.toString());
-        log.info(response.getClass().toString());    
-        CityAutoComplete x = response.getBody();
-        log.info(x.toString());
-        
-        */
-        
-        //ObjectNode objectNode = restTemplate.getForObject(url, ObjectNode.class);
-        //JsonNode highDepth = objectNode.get("RESULTS");
-        //log.info(highDepth.toString()); 
-        
-        //ResponseEntity<List<MyBean>> response = template.exchange(
-        		//"http://example.com",HttpMethod.GET, null, myBean);
-         
-        //log.info((String)myDomainList.size());
-        //log.info(myDomainList.get(0).toString());
-        
-        /*
-        for (CityItem city1 : myDomainList) {
-        	System.out.println(city1.toString());
-        	log.info(city1.toString());
-        }
-        */
-        /*
-        for (CityItem city1: myDomainList) {
-        	 System.out.print(city1.toString());
-        	 log.info(city1.toString());
-        }
-        */
-    
-       //CityItem[] cc = responseEntity.getBody();
-
- // CityAutoComplete usage
-
-      //CityAutoComplete cityAutoComplete = restTemplate.getForObject(url, CityAutoComplete.class);
-      //log.info(cityAutoComplete.toString());
-      
- /*
-       ArrayList<CityItem> items = (ArrayList<CityItem>) cityAutoComplete.getRESULTS();
-
-      CityItem[] a = null;
-      items.toArray(a);
-      
-      log.info(a.toString());
-      */      
-        //ResponseEntity<ArrayList<CityItem> responseEntity = restTemplate.getForEntity(url, ArrayList.class);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(supportedMediaTypes);
-        HttpEntity<CityItem> entity = new HttpEntity<CityItem>(headers);
-        
-        ResponseEntity<CityAutoComplete> result = restTemplate.exchange(url, HttpMethod.GET, entity, CityAutoComplete.class);
-
-        log.info(result.getBody().toString());
-
-        
-        ResponseEntity<CityAutoComplete> responseEntity = restTemplate.getForEntity(url, CityAutoComplete.class);
-        CityAutoComplete body = responseEntity.getBody();
-        System.out.println(responseEntity.getBody());
-        System.out.println(body);
+        ResponseEntity<Conditions> responseEntity = restTemplate.getForEntity(url, Conditions.class);
+        Conditions body = responseEntity.getBody();
         log.info(body.toString());
         
-        ArrayList<CityItem> q = (ArrayList<CityItem>) body.getRESULTS();
-        System.out.println(q.size());
+        model.addAttribute("city", cityCountry);        
+        model.addAttribute("conditions", body);
         
-   
-        
-        model.addAttribute("city", city);
-
-        return "citylist";
+        return "weather";
     }
-
 }

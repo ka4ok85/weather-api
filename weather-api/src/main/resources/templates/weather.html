@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Weather for ' + ${city.city} + '(' + ${city.country} + ')'"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<h1 th:text="'Weather for ' + ${city.city} + '(' + ${city.country} + ')'"></h1>
+	<p th:text="'City: ' + ${conditions.conditionsCurrentObservation.conditionsDisplayLocation.full}"></p>
+	<p th:text="'Zip: ' + ${conditions.conditionsCurrentObservation.conditionsDisplayLocation.zip}"></p>
+	<p th:text="'Observation Time: ' + ${conditions.conditionsCurrentObservation.observationTime}"></p>
+	<p th:text="'Weather: ' + ${conditions.conditionsCurrentObservation.weather}"></p>
+	<p th:text="'Temperature: ' + ${conditions.conditionsCurrentObservation.temperatureString}"></p>
+	<p th:text="'Wind: ' + ${conditions.conditionsCurrentObservation.windString}"></p>
+	
+</body>
+</html>

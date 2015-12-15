@@ -6,7 +6,24 @@
 </head>
 <body>
 	<h1>Result</h1>
-    <p th:text="'your city: ' + ${city.city}" />
+    <p th:text="'your input: ' + ${city.city}" />
+
+		<table cellpadding="5" border="1">
+	      <tr>
+	        <th>City</th>
+	        <th>Country</th>
+	        <th>Current weather</th>
+	      </tr>
+	      <tr th:each="city,iterationStatus  : ${cityList}">
+	        <td th:text="${city.name}">City</td>
+	        <td th:text="${city.c}">Country</td>
+			<td th:with="variableName=${#strings.arraySplit(city.name,',')}">
+				<a href="details.html" th:href="@{/details(country=${variableName[1].trim()},city=${variableName[0].trim()})}">view</a>			
+	        </td>
+	      </tr>
+	    </table>
+
+    
     <a href="/welcome">Start again</a>
 </body>
 </html>
